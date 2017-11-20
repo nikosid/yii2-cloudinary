@@ -1,0 +1,35 @@
+{
+    "name": "nikosid/yii2-cloudinary",
+    "description": "Yii2 Cloudinary Component",
+    "type": "yii2-extension",
+    "keywords": [
+        "nikosid",
+        "yii",
+        "yii2",
+        "yii 2",
+        "extension",
+        "behavior",
+        "cloudinary"
+    ],
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/nikosid/yii2-cloudinary/issues",
+        "source": "https://github.com/nikosid/yii2-cloudinary"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "yiisoft/yii2": "~2.0.6",
+        "cloudinary/cloudinary_php": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "nikosid\\cloudinary\\": "src"
+        }
+    },
+    "authors": [
+        {
+            "name": "nikosid",
+            "email": "nikosid@gmail.com"
+        }
+    ]
+}
