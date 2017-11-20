@@ -11,7 +11,7 @@
         "behavior",
         "cloudinary"
     ],
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "support": {
         "issues": "https://github.com/nikosid/yii2-cloudinary/issues",
         "source": "https://github.com/nikosid/yii2-cloudinary"
