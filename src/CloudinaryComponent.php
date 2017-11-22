@@ -5,6 +5,7 @@ namespace nikosid\cloudinary;
 use Cloudinary;
 use Cloudinary\Uploader;
 use yii\base\Component;
+use yii\helpers\Url;
 
 class CloudinaryComponent extends Component
 {
@@ -12,6 +13,7 @@ class CloudinaryComponent extends Component
     public $api_key;
     public $api_secret;
     public $cdn_subdomain;
+    public $useSiteDomain = false;
 
     /** @var string */
     public $prefix = '';
@@ -34,7 +36,12 @@ class CloudinaryComponent extends Component
      */
     public function getUrl($publicId, array $options = [])
     {
-        return cloudinary_url($publicId, $options);
+        $baseUrl = cloudinary_url($publicId, $options);
+        if (true === $this->useSiteDomain) {
+            $homeUrl = Url::home(true);
+            $baseUrl = preg_replace('/^https?:\/\/\w+.cloudinary.com\//i', $homeUrl, $baseUrl);
+        }
+        return $baseUrl;
     }
 
     /**

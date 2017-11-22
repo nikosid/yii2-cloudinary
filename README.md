@@ -29,8 +29,21 @@ You need to configure cloudinary component in your application config.
             'api_key' => 'YOUR_API_KEY',
             'api_secret' => 'YOUR_API_SECRET',
             'cdn_subdomain' => true,//optional
+            'useSiteDomain' => false,
         ],
     ],
+```
+
+By setting **$useSiteDomain** to true you can make URLs to your doman
+and than proxy them to cloudinary server. By default it's false.
+
+###Example of nginx config for forward traffic to cloudinary server ###
+
+```
+    location /YOUR_CLOUD_NAME/ {
+        proxy_pass https://res.cloudinary.com;
+        proxy_set_header Host res.cloudinary.com;
+    }
 ```
  
 ## CloudinaryBehavior ##
