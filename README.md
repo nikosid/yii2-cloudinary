@@ -118,6 +118,28 @@ You can also get generated thumbnail image url:
     echo $model->getThumb('medium');
 ```
 
+### Both type of upload
+You can also specify few attributes in priotiry order.
+
+```php
+    public function behaviors()
+    {
+        return [
+            'cloudynary' => [
+                'class' => CloudinaryBehavior::class,
+                'attribute' => 'picture,picture_url',
+                'publicId' => Yii::$app->name . '/articles/main{id}',
+                'thumbs' => [
+                    'large' => ['secure' => true, 'width' => 848, 'height' => 536, 'crop' => 'fill'],
+                    'medium' => ['secure' => true, 'width' => 555, 'height' => 536, 'crop' => 'fill'],
+                    'small' => ['secure' => true, 'width' => 130, 'height' => 125, 'crop' => 'fill'],
+                ],
+            ],
+        ];
+    }
+```
+It means if user upload `picture` Cloudinary get it, but if not, we also check picture_url and try to upload it 
+
 ## Licence ##
 
 MIT
