@@ -24,6 +24,8 @@ class CloudinaryBehavior extends Behavior
     public $publicIdAttribute;
     /** @var string */
     public $attribute;
+    /** @var array */
+    public $attributes;
     /** @var string */
     public $publicId;
 
@@ -47,6 +49,8 @@ class CloudinaryBehavior extends Behavior
             throw new InvalidConfigException('attribute parameter must be set');
         }
 
+        $this->attributes = explode(',', $this->attribute);
+
         parent::init();
     }
 
@@ -68,8 +72,12 @@ class CloudinaryBehavior extends Behavior
      */
     public function afterInsert(AfterSaveEvent $event)
     {
-        if (isset($this->owner->{$this->attribute}) && !empty($this->owner->{$this->attribute})) {
-            $this->upload();
+        foreach ($this->attributes as $attribute) {
+            if (isset($this->owner->{$attribute}) && !empty($this->owner->{$attribute})) {
+                if (true === $this->upload($attribute)) {
+                    break;
+                }
+            }
         }
     }
 
@@ -80,8 +88,12 @@ class CloudinaryBehavior extends Behavior
     public function beforeUpdate($event)
     {
         //@TODO: Добавить проверку на изменение тегов, и если нужно, то обновить их тут, не обязательно обновляя картинку
-        if (isset($this->owner->dirtyAttributes[$this->attribute])) {
-            $this->upload(true);
+        foreach ($this->attributes as $attribute) {
+            if (isset($this->owner->dirtyAttributes[$attribute])) {
+                if (true === $this->upload($attribute, true)) {
+                    break;
+                }
+            }
         }
     }
 
@@ -90,27 +102,30 @@ class CloudinaryBehavior extends Behavior
      */
     public function beforeDelete($event)
     {
-        if (isset($this->owner->{$this->attribute}) && !empty($this->owner->{$this->attribute})) {
-            $this->delete();
+        foreach ($this->attributes as $attribute) {
+            if (isset($this->owner->{$attribute}) && !empty($this->owner->{$attribute})) {
+                $this->delete();
+            }
         }
     }
 
     /**
+     * @param $attribute
      * @param bool $invalidate
      * @return bool
      * @throws Exception
      */
-    private function upload($invalidate = false)
+    private function upload($attribute, $invalidate = false)
     {
-        $file = UploadedFile::getInstance($this->owner, $this->attribute);
+        $file = UploadedFile::getInstance($this->owner, $attribute);
         if ($file) {
             $toUpload = $file->tempName;
         } else {
-            $toUpload = $this->owner->{$this->attribute};
+            $toUpload = $this->owner->{$attribute};
             $urlValidator = new UrlValidator();
             if (!$urlValidator->validate($toUpload)) {
                 //@TODO: Возможно и тут стоит не ошибку кидать, а инвалидировать модель
-                throw new Exception('Error. '.$this->attribute.' must be an url');
+                throw new Exception('Error. ' . $attribute . ' must be an url');
             }
         }
 
