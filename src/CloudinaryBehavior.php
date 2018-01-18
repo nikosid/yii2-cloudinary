@@ -20,6 +20,9 @@ use yii\web\UploadedFile;
 class CloudinaryBehavior extends Behavior
 {
 
+    const TYPE_FILE = 'file';
+    const TYPE_URL = 'url';
+
     /** @var string */
     public $publicIdAttribute;
     /** @var string */
