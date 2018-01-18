@@ -256,11 +256,12 @@ class CloudinaryBehavior extends Behavior
 
     /**
      * @param string $name
+     * @param string $format
      * @return string
      */
-    public function getThumb($name)
+    public function getThumb($name, $format = '')
     {
         $config = ArrayHelper::getValue($this->thumbs, $name);
-        return $this->cloudinary->getUrl($this->getPublicId(), $config);
+        return $this->cloudinary->getUrl($this->getPublicId(), $config) . ($format ? '.' . $format : '');
     }
 }
