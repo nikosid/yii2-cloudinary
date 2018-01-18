@@ -31,8 +31,12 @@ class CloudinaryBehavior extends Behavior
     public $attributes;
     /** @var string */
     public $publicId;
-
+    /** @var array */
     public $thumbs;
+    /** @var array */
+    private $types = [];
+    /** @var array */
+    private $needToUpload = [];
 
     /** @var CloudinaryComponent */
     private $cloudinary;
@@ -64,36 +68,58 @@ class CloudinaryBehavior extends Behavior
     {
         return [
             ActiveRecord::EVENT_BEFORE_DELETE => 'beforeDelete',
-            ActiveRecord::EVENT_AFTER_INSERT => 'afterInsert',
             ActiveRecord::EVENT_BEFORE_UPDATE => 'beforeUpdate',
+            ActiveRecord::EVENT_BEFORE_INSERT => 'beforeInsert',
+            ActiveRecord::EVENT_AFTER_INSERT => 'afterSave',
+            ActiveRecord::EVENT_AFTER_UPDATE => 'afterSave',
         ];
     }
 
-    /**
-     * @param AfterSaveEvent $event
-     * @throws Exception
-     */
-    public function afterInsert(AfterSaveEvent $event)
+    public function beforeInsert($event)
     {
         foreach ($this->attributes as $attribute) {
             if (isset($this->owner->{$attribute}) && !empty($this->owner->{$attribute})) {
-                if (true === $this->upload($attribute)) {
-                    break;
-                }
+                $this->needToUpload[] = $attribute;
+                $this->types[$attribute] = $this->getAttrType($attribute);
             }
         }
+    }
+
+    public function beforeUpdate($event)
+    {
+        //@TODO: Добавить проверку на изменение тегов, и если нужно, то обновить их тут, не обязательно обновляя картинку
+        foreach ($this->attributes as $attribute) {
+            if (isset($this->owner->dirtyAttributes[$attribute])) {
+                $this->needToUpload[] = $attribute;
+                $this->types[$attribute] = $this->getAttrType($attribute);
+            }
+        }
+    }
+
+    private function getAttrType($attribute)
+    {
+        $file = UploadedFile::getInstance($this->owner, $attribute);
+        if ($file) {
+            return self::TYPE_FILE;
+        }
+        //@TODO: Add url validation
+        return self::TYPE_URL;
     }
 
     /**
      * @param $event
      * @throws Exception
      */
-    public function beforeUpdate($event)
+    public function afterSave($event)
     {
-        //@TODO: Добавить проверку на изменение тегов, и если нужно, то обновить их тут, не обязательно обновляя картинку
-        foreach ($this->attributes as $attribute) {
-            if (isset($this->owner->dirtyAttributes[$attribute])) {
-                if (true === $this->upload($attribute, true)) {
+        foreach ($this->needToUpload as $attribute) {
+            $attributeType = ArrayHelper::getValue($this->types, $attribute);
+            if (self::TYPE_FILE === $attributeType) {
+                if (true === $this->uploadFile($attribute, true)) {
+                    break;
+                }
+            } else if (self::TYPE_URL === $attributeType) {
+                if (true === $this->uploadUrl($attribute, true)) {
                     break;
                 }
             }
@@ -116,22 +142,41 @@ class CloudinaryBehavior extends Behavior
      * @param $attribute
      * @param bool $invalidate
      * @return bool
+     */
+    private function uploadFile($attribute, $invalidate = false)
+    {
+        /*$file = UploadedFile::getInstance($this->owner, $attribute);
+        $toUpload = $file->tempName;*/
+        $toUpload = $this->owner->getUploadPath($attribute);
+
+        return $this->upload($toUpload, $invalidate);
+    }
+
+    /**
+     * @param $attribute
+     * @param bool $invalidate
+     * @return bool
      * @throws Exception
      */
-    private function upload($attribute, $invalidate = false)
+    private function uploadUrl($attribute, $invalidate = false)
     {
-        $file = UploadedFile::getInstance($this->owner, $attribute);
-        if ($file) {
-            $toUpload = $file->tempName;
-        } else {
-            $toUpload = $this->owner->{$attribute};
-            $urlValidator = new UrlValidator();
-            if (!$urlValidator->validate($toUpload)) {
-                //@TODO: Возможно и тут стоит не ошибку кидать, а инвалидировать модель
-                throw new Exception('Error. ' . $attribute . ' must be an url');
-            }
+        $toUpload = $this->owner->{$attribute};
+        $urlValidator = new UrlValidator();
+        if (!$urlValidator->validate($toUpload)) {
+            //@TODO: Возможно и тут стоит не ошибку кидать, а инвалидировать модель
+            throw new Exception('Error. ' . $attribute . ' must be an url');
         }
 
+        return $this->upload($toUpload, $invalidate);
+    }
+
+    /**
+     * @param $toUpload
+     * @param bool $invalidate
+     * @return bool
+     */
+    private function upload($toUpload, $invalidate = false)
+    {
         try {
             $info = $this->cloudinary->upload($toUpload, $this->getOptions($invalidate));
         } catch (\Cloudinary\Error $e) {
