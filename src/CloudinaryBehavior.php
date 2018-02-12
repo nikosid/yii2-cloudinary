@@ -89,7 +89,7 @@ class CloudinaryBehavior extends Behavior
     {
         //@TODO: Добавить проверку на изменение тегов, и если нужно, то обновить их тут, не обязательно обновляя картинку
         foreach ($this->attributes as $attribute) {
-            if (isset($this->owner->dirtyAttributes[$attribute])) {
+            if (isset($this->owner->dirtyAttributes[$attribute])  && !empty($this->owner->dirtyAttributes[$attribute])) {
                 $this->needToUpload[] = $attribute;
                 $this->types[$attribute] = $this->getAttrType($attribute);
             }
