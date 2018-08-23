@@ -9,11 +9,11 @@ The preferred way to install this extension is through [composer](http://getcomp
 
 Either run
 
-    php composer.phar require nikosid/yii2-coudinary "dev-master"
+    php composer.phar require nikosid/yii2-cloudinary "dev-master"
 
 or add
 
-    "nikosid/yii2-coudinary": "dev-master"
+    "nikosid/yii2-cloudinary": "dev-master"
 
 to the `require` section of your composer.json.
 
@@ -57,7 +57,7 @@ Attach the behavior to your model class:
     {
         return [
             'cloudynary' => [
-                'class' => CloudinaryBehavior::class,
+                'class' => nikosid\cloudinary\CloudinaryComponent::class,
                 'attribute' => 'picture',
                 'publicId' => Yii::$app->name . '/articles/main{id}',
                 'thumbs' => [
