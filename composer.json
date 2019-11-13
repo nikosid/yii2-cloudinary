@@ -20,7 +20,7 @@
         "php": ">=5.4.0",
         "yiisoft/yii2": "~2.0.6",
         "cloudinary/cloudinary_php": "dev-master",
-        "mongosoft/yii2-upload-behavior": "*"
+        "mohorev/yii2-upload-behavior": "*"
     },
     "autoload": {
         "psr-4": {
