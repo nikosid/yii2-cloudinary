@@ -56,8 +56,8 @@ Attach the behavior to your model class:
     public function behaviors()
     {
         return [
-            'cloudynary' => [
-                'class' => nikosid\cloudinary\CloudinaryComponent::class,
+            'cloudinary' => [
+                'class' => nikosid\cloudinary\CloudinaryBehavior::class,
                 'attribute' => 'picture',
                 'publicId' => Yii::$app->name . '/articles/main{id}',
                 'thumbs' => [
@@ -125,7 +125,7 @@ You can also specify few attributes in priotiry order.
     public function behaviors()
     {
         return [
-            'cloudynary' => [
+            'cloudinary' => [
                 'class' => CloudinaryBehavior::class,
                 'attribute' => 'picture,picture_url',
                 'publicId' => Yii::$app->name . '/articles/main{id}',
