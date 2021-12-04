@@ -19,8 +19,9 @@
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": "~2.0.6",
-        "cloudinary/cloudinary_php": "*",
-        "mohorev/yii2-upload-behavior": "*"
+        "cloudinary/cloudinary_php": "1.20.0",
+        "mohorev/yii2-upload-behavior": "*",
+        "yidas/yii2-bower-asset": "2.0.13.1"
     },
     "autoload": {
         "psr-4": {
